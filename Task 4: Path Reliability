@@ -1,0 +1,53 @@
+from collections import deque
+
+class TowerGraph:
+    def __init__(self):
+        self.graph = {}
+
+    def add_tower(self, tower):
+        self.graph[tower] = []
+
+    def add_link(self, tower1, tower2, reliability):
+        self.graph[tower1].append((tower2, reliability))
+        self.graph[tower2].append((tower1, reliability))
+
+    def find_most_reliable_path(self, start_tower, end_tower):
+        queue = deque()
+        queue.append(start_tower)
+
+        reliability = {tower: 0 for tower in self.graph}
+        reliability[start_tower] = 1
+
+        transitions = {tower: 0 for tower in self.graph}
+        transitions[start_tower] = 0
+
+        while queue:
+            current_tower = queue.popleft()
+
+            for neighbor, neighbor_reliability in self.graph[current_tower]:
+                new_reliability = reliability[current_tower] * neighbor_reliability
+                new_transitions = transitions[current_tower] + 1
+
+                if new_reliability > reliability[neighbor]:
+                    reliability[neighbor] = new_reliability
+                    transitions[neighbor] = new_transitions
+                    queue.append(neighbor)
+                elif new_reliability == reliability[neighbor] and new_transitions < transitions[neighbor]:
+                    transitions[neighbor] = new_transitions
+                    queue.append(neighbor)
+
+        # Восстановление пути
+        path = [end_tower]
+        current_tower = end_tower
+
+        while current_tower != start_tower:
+            for neighbor, _ in self.graph[current_tower]:
+                if reliability[neighbor] < reliability[current_tower]:
+                    path.append(neighbor)
+                    current_tower = neighbor
+                    break
+
+        path.reverse()
+        reliability_score = reliability[end_tower]
+
+        return path, reliability_score
