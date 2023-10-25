@@ -1,0 +1,53 @@
+import operator
+
+def optimize_coverage(city_grid, blocked_blocks, towers, coverage_zones, budget):
+    # Создание списка башен с их характеристиками
+    tower_data = []
+    for tower in towers:
+        tower_row, tower_col, tower_range, tower_cost = tower
+        tower_data.append({
+            'position': (tower_row, tower_col),
+            'range': tower_range,
+            'cost': tower_cost
+        })
+
+    # Сортировка башен по отношению стоимости к охвату в порядке убывания
+    tower_data.sort(key=lambda x: x['cost'] / x['range'], reverse=True)
+
+    # Список выбранных башен
+    selected_towers = []
+
+    # Проход по отсортированному списку башен
+    for tower in tower_data:
+        # Проверка, что добавление башни не превысит бюджет
+        if sum(t['cost'] for t in selected_towers) + tower['cost'] <= budget:
+            # Проверка, что добавление башни увеличит охват
+            if calculate_coverage(city_grid, blocked_blocks, selected_towers + [tower]) > \
+                    calculate_coverage(city_grid, blocked_blocks, selected_towers):
+                selected_towers.append(tower)
+
+    return selected_towers
+
+# Пример использования:
+
+city_grid = [
+    [True, True, True, True],
+    [True, True, True, True],
+    [True, False, False, True],
+    [True, True, True, True]
+]
+
+blocked_blocks = [(2, 1), (2, 2)]
+
+towers = [
+    (0, 0, 2, 10),
+    (3, 3, 1, 5),
+    (1, 1, 3, 15)
+]
+
+coverage_zones = [(1, 1), (1, 2), (2, 1), (2, 2), (2, 3)]
+
+budget = 20
+
+selected_towers = optimize_coverage(city_grid, blocked_blocks, towers, coverage_zones, budget)
+print(selected_towers)
