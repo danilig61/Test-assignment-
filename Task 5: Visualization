@@ -1,0 +1,58 @@
+import matplotlib.pyplot as plt
+
+def visualize_city_grid(city_grid, blocked_blocks, towers, coverage_zones, path=None):
+    # Получение размеров сетки города
+    num_rows = len(city_grid)
+    num_cols = len(city_grid[0])
+
+    # Создание пустого графика
+    fig, ax = plt.subplots()
+
+    # Отображение заблокированных блоков
+    for row in range(num_rows):
+        for col in range(num_cols):
+            if (row, col) in blocked_blocks:
+                ax.add_patch(plt.Rectangle((col, row), 1, 1, facecolor='black'))
+
+    # Отображение башен
+    for tower in towers:
+        tower_row, tower_col = tower
+        ax.add_patch(plt.Rectangle((tower_col, tower_row), 1, 1, facecolor='red'))
+
+    # Отображение зон покрытия
+    for zone in coverage_zones:
+        zone_row, zone_col = zone
+        ax.add_patch(plt.Rectangle((zone_col, zone_row), 1, 1, facecolor='blue', alpha=0.3))
+
+    # Отображение пути передачи данных
+    if path is not None:
+        path_rows, path_cols = zip(*path)
+        ax.plot(path_cols, path_rows, color='green')
+
+    # Настройка осей и меток
+    ax.set_xlim([0, num_cols])
+    ax.set_ylim([0, num_rows])
+    ax.set_aspect('equal')
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    # Отображение графика
+    plt.show()
+# Пример использования:
+
+city_grid = [
+    [True, True, True, True],
+    [True, True, True, True],
+    [True, False, False, True],
+    [True, True, True, True]
+]
+
+blocked_blocks = [(2, 1), (2, 2)]
+
+towers = [(0, 0), (3, 3)]
+
+coverage_zones = [(1, 1), (1, 2), (2, 1), (2, 2), (2, 3)]
+
+path = [(0, 0), (1, 1), (2, 2), (3, 3)]
+
+visualize_city_grid(city_grid, blocked_blocks, towers, coverage_zones, path)
